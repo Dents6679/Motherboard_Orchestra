@@ -15,9 +15,11 @@ def handle_clients(s):
         client_socket, address = s.accept()
         clients.append(client_socket)
         window['-CLIENTS-'].update(str(len(clients)) + " clients connected.")
-
         print(f"Connection from {address} has been established")
-        print(f"Current Clients:\n {[str(client) for client in clients]}")
+
+
+
+
 
 # Start server to establish connections. Retain connections and send data to clients.
 def start_server():
@@ -36,8 +38,9 @@ def start_server():
     client_handler_thread = threading.Thread(target=handle_clients, args=[s])
     client_handler_thread.start()
 
+
     while True:
-        print("Waiting...")
+
         # Event loop
         event, values = window.read()
 
@@ -52,7 +55,12 @@ def start_server():
             filepath = values["-IN-"]
             print(filepath)
 
-        ## Server-Client loop.
+        if event == '-SHOW-':
+            print(f"Current Clients:\n {[str(client) for client in clients]}")
+
+
+
+        # Server-Client loop.
 
         if send_client_data:  # Send data to all clients
             if not clients:  # If no clients are connected, do not send data
@@ -62,19 +70,25 @@ def start_server():
 
             print("Sending message to all clients...")
             for client in clients: # Send data to all clients.
-                info = "Welcome to the server! With this server you'll be able to do something awesome.@BREAK"
-                client.send(bytes(info, "utf-8"))
-                client.close()
+                try:
+                    info = "Welcome to the server! With this server you'll be able to do something awesome.@BREAK"
+                    client.send(bytes(info, "utf-8"))
+                except ConnectionResetError:
+                    print("Client disconnected.")
+                    clients.remove(client)
+                    client.close()
+                    window['-CLIENTS-'].update(str(len(clients)) + " clients connected.")
+                    continue
 
-            clients = []  # Clear clients list after sending data
+
+
+            # clients = []  # Clear clients list after sending data
             send_client_data = False  # Reset flag to False after sending data
 
     # Close server socket and GUI window
     print("Closing server...")
     s.close()
     window.close()
-
-
 
 
 # Flags
@@ -85,7 +99,7 @@ clients = []
 
 # GUI layout
 layout = [[sg.Text("Music input", expand_x=True, font=("Helvetica", 20))],
-          [sg.Text("0 clients connected.", key='-CLIENTS-')],
+          [sg.Text("0 clients connected.", key='-CLIENTS-'), sg.Button("Show Clients", key="-SHOW-")],
           [sg.Text("Choose a file: "), sg.Input(), sg.FileBrowse(key="-IN-")], [sg.Button("Load Song"), sg.Button("Submit")]]
 
 window = sg.Window('Server GUI', layout)
