@@ -16,10 +16,11 @@ def find_max_overlapping_notes(file_path):
     max_overlapping_notes = 0
     score = converter.parse(file_path)
 
-    bChords = score.chordify()
+    chordified_song = score.chordify()
 
-    for thisChord in bChords.recurse().getElementsByClass(chord.Chord):
-        chord_length = len(thisChord.notes)
+    for forced_chord in chordified_song.recurse().getElementsByClass(chord.Chord):
+        print(f"Chord: {forced_chord} at offset {forced_chord.offset} for {forced_chord.duration.quarterLength} beats. Notes: {forced_chord.notes}")
+        chord_length = len(forced_chord.notes)
 
         if chord_length > max_overlapping_notes:
             max_overlapping_notes = chord_length
@@ -28,17 +29,17 @@ def find_max_overlapping_notes(file_path):
 
 
 def separate_song_overlappings(file_path):
-    score = converter.parse(file_path)
-    notes = extract_notes_from_score(score)
-    pass
+
+
 
 
 
 
 
 # Example usage
-file_path = 'Sample Songs/MiiChannel.mid'
+file_path = 'Sample Songs/tester2.mid'
 find_max_overlapping_notes(file_path)
+# separate_song_overlappings(file_path)
 
 # check_note_overlap(notes)
 
