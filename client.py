@@ -1,8 +1,11 @@
 import socket
 
+
+print("Client started...")
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #  These need to be changed into a local IP rather than the hostname for local testing
-s.connect((socket.gethostname(), 1234))
+
+s.connect((socket.gethostname(), 6969))
 
 full_msg = ''
 while True:
