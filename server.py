@@ -2,6 +2,9 @@ import socket
 import PySimpleGUI as sg
 import threading
 
+import encoder
+from encoder import *
+
 
 
 
@@ -16,8 +19,6 @@ def handle_clients(s):
         clients.append(client_socket)
         window['-CLIENTS-'].update(str(len(clients)) + " clients connected.")
         print(f"Connection from {address} has been established")
-
-
 
 
 
@@ -49,11 +50,33 @@ def start_server():
             break
 
         if event == 'Submit':  # Allow server to send data to clients by setting flag to True
+
+            if max_overlapping_notes > len(clients):
+                window["-OUTPUT-"].update(
+                    f"{window['-OUTPUT'].get_text()} \n {max_overlapping_notes} clients are required for this song.")
+                continue
+
             send_client_data = True
 
+
+
+            # window["-OUTPUT-"].update(
+            #     f"{window["-OUTPUT"].get_text()} \n {max_overlapping_notes} clients are required for this song.")
+
+
         if event == 'Load Song':
-            filepath = values["-IN-"]
-            print(filepath)
+            song_file_path = values["-IN-"]
+
+            if song_file_path[-4::] != ".mid":
+                window["-OUTPUT-"].update("Incorrect file type. Please select a .mid file.")
+                continue
+
+            max_overlapping_notes = find_max_overlapping_notes(song_file_path)
+            window["-SUBMIT-"].update(disabled=False)
+
+
+
+
 
         if event == '-SHOW-':
             print(f"Current Clients:\n {[str(client) for client in clients]}")
@@ -71,7 +94,7 @@ def start_server():
             print("Sending message to all clients...")
             for client in clients: # Send data to all clients.
                 try:
-                    info = "Welcome to the server! With this server you'll be able to do something awesome.@BREAK"
+                    info = "Welcome to the server! With this server you'll be able to do something awesome."
                     client.send(bytes(info, "utf-8"))
                 except ConnectionResetError:
                     print("Client disconnected.")
@@ -98,11 +121,12 @@ send_client_data = False
 clients = []
 
 # GUI layout
-layout = [[sg.Text("Music input", expand_x=True, font=("Helvetica", 20))],
-          [sg.Text("0 clients connected.", key='-CLIENTS-'), sg.Button("Show Clients", key="-SHOW-")],
-          [sg.Text("Choose a file: "), sg.Input(), sg.FileBrowse(key="-IN-")], [sg.Button("Load Song"), sg.Button("Submit")]]
+layout = [[sg.Text("Composer", expand_x=True, font=("Helvetica", 20))],
+          [sg.Text("0 clients connected.", key='-CLIENTS-'), sg.Button("Refresh", key="-SHOW-")],
+          [sg.Text("Choose a file: "), sg.Input(), sg.FileBrowse(key="-IN-")], [sg.Button("Load Song"), sg.Button("Submit", key="-SUBMIT-", disabled=True)],
+          [sg.Text("Please input a .mid file to play.", key="-OUTPUT-")],]
 
-window = sg.Window('Server GUI', layout)
+window = sg.Window('Composer', layout)
 
 # Driver Code
 start_server()
