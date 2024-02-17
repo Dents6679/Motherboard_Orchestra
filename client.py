@@ -11,7 +11,7 @@ full_msg = ''
 while True:
     msg = s.recv(8)
     if len(msg) <= 0:
-        break
+        continue
     full_msg += msg.decode("utf-8")
-
-print(full_msg)
+    if msg[:6] == "@BREAK":
+        print(msg[:-6:])
