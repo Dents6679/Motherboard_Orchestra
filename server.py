@@ -49,19 +49,18 @@ def start_server():
         if event == sg.WINDOW_CLOSED:
             break
 
-        if event == 'Submit':  # Allow server to send data to clients by setting flag to True
-
-            if max_overlapping_notes > len(clients):
-                window["-OUTPUT-"].update(
-                    f"{window['-OUTPUT'].get_text()} \n {max_overlapping_notes} clients are required for this song.")
+        if event == '-SUBMIT-':  # Allow server to send data to clients by setting flag to True
+            if len(clients) == 0:
+                window["-OUTPUT-"].update("No clients connected. Cannot send data.")
                 continue
 
+            if max_overlapping_notes > len(clients):
+                window["-OUTPUT-"].update(f"{max_overlapping_notes} clients are required for this song.")
+                continue
+
+            window["-OUTPUT-"].update(f"Sending data to clients...")
             send_client_data = True
 
-
-
-            # window["-OUTPUT-"].update(
-            #     f"{window["-OUTPUT"].get_text()} \n {max_overlapping_notes} clients are required for this song.")
 
 
         if event == 'Load Song':
@@ -73,6 +72,7 @@ def start_server():
 
             max_overlapping_notes = find_max_overlapping_notes(song_file_path)
             window["-SUBMIT-"].update(disabled=False)
+            window["-OUTPUT-"].update(f"{song_file_path.split('/')[-1]} has been loaded.")
 
 
 
@@ -84,7 +84,6 @@ def start_server():
 
 
         # Server-Client loop.
-
         if send_client_data:  # Send data to all clients
             if not clients:  # If no clients are connected, do not send data
                 print("No clients connected. Cannot send data.")
@@ -94,7 +93,7 @@ def start_server():
             print("Sending message to all clients...")
             for client in clients: # Send data to all clients.
                 try:
-                    info = "Welcome to the server! With this server you'll be able to do something awesome."
+                    info = "Welcome to the server! With this server you'll be able to do something awesome.@BREAK"
                     client.send(bytes(info, "utf-8"))
                 except ConnectionResetError:
                     print("Client disconnected.")
@@ -123,11 +122,21 @@ clients = []
 # GUI layout
 layout = [[sg.Text("Composer", expand_x=True, font=("Helvetica", 20))],
           [sg.Text("0 clients connected.", key='-CLIENTS-'), sg.Button("Refresh", key="-SHOW-")],
-          [sg.Text("Choose a file: "), sg.Input(), sg.FileBrowse(key="-IN-")], [sg.Button("Load Song"), sg.Button("Submit", key="-SUBMIT-", disabled=True)],
+          [sg.Text("Choose a file: "), sg.Input(), sg.FileBrowse(key="-IN-")],
+          [sg.Button("Load Song"), sg.Button("Submit", key="-SUBMIT-", disabled=True)],
           [sg.Text("Please input a .mid file to play.", key="-OUTPUT-")],]
 
 window = sg.Window('Composer', layout)
 
 # Driver Code
 start_server()
+
+
+
+
+
+
+
+
+
 

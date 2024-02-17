@@ -19,7 +19,6 @@ def find_max_overlapping_notes(file_path):
     chordified_song = score.chordify()
 
     for forced_chord in chordified_song.recurse().getElementsByClass(chord.Chord):
-        print(f"Chord: {forced_chord} at offset {forced_chord.offset} for {forced_chord.duration.quarterLength} beats. Notes: {forced_chord.notes}")
         chord_length = len(forced_chord.notes)
 
         if chord_length > max_overlapping_notes:
@@ -29,7 +28,7 @@ def find_max_overlapping_notes(file_path):
 
 
 def separate_song_overlappings(file_path):
-
+    pass
 
 
 
