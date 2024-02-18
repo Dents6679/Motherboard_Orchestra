@@ -38,10 +38,13 @@ def separate_song_overlappings(file_path):
     for i, note in enumerate(notes):
         note_sets[i % max_overlap].append(note)
 
-    for note_set in note_sets:
+    for i, note_set in enumerate(note_sets):
         s = m21.stream.Stream()
         for note in note_set:
             s.append(note)
+        fp = f"tmp/{i}.mid"
+        s.write("midi", fp)
+    print("Written 4 note files to disk.")
 
 
 
