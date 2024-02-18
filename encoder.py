@@ -29,22 +29,38 @@ def find_max_overlapping_notes(file_path):
 
 def separate_song_overlappings(file_path):
     notes = []
+    streams = []
     score = m21.converter.parse(file_path)
     notes = extract_notes_from_score(score)
-
     max_overlap = find_max_overlapping_notes(file_path)
-    note_sets = [[]]*max_overlap
-    print(note_sets)
-    for i, note in enumerate(notes):
+
+    note_sets = [[]]*max_overlap  # Create empty note sets
+
+    for i, note in enumerate(notes):  # Distribute notes into note sets.
         note_sets[i % max_overlap].append(note)
 
+    i = 0
+    for note in notes:
+
+        if note.offset == 0 and i > max_overlap - 1:
+            #Handle chord notes
+            i += 1
+            continue
+
+        for note_set in note_sets:
+            note_set.append(m21.note.Rest(duration=note.duration))
+
+        note_sets[i % 4].pop()
+        note_sets[i % 4].append(note)
+
+
+
     for i, note_set in enumerate(note_sets):
-        s = m21.stream.Stream()
-        for note in note_set:
-            s.append(note)
+        s = note_set.
         fp = f"tmp/{i}.mid"
         s.write("midi", fp)
     print("Written 4 note files to disk.")
+
 
 
 
