@@ -1,4 +1,6 @@
 import socket
+import threading
+
 import PySimpleGUI as sg
 import os
 
@@ -10,11 +12,32 @@ layout = [[sg.Text("Client", expand_x=True, font=("Helvetica", 20))],
 
           ]
 
+
+def handle_server(s):
+    msg_len = 0
+    full_msg = ''
+    while True:
+        msg = s.recv(8)
+
+        if msg:  # If there is data to be received
+            msg_len += 1
+            full_msg += msg.decode("utf-8")
+
+        if full_msg[-6::] == "@BREAK":
+            print(f"Message received from server in {msg_len} packets.")
+            msg_len = 0  # Reset message length
+            process_received_data(full_msg)
+            print(full_msg[:-6])
+            full_msg = ''
+            msg = ''
+
+def process_received_data(full_msg):
+    pass
+
+
+
+
 window = sg.Window('Client', layout)
-
-
-full_msg = ''
-msg_len = 0
 
 while True:
     event, values = window.read()
@@ -37,20 +60,10 @@ while True:
             print("Connection refused. Try again.")
             continue
 
-        print("Got here.")
-        # Blocking Issue is here
-        msg = s.recv(8)
+        client_handler_thread = threading.Thread(target=handle_server, args=[s])
+        client_handler_thread.start()
 
-        if msg:  # If there is data to be received
-            print(f"message: {msg}")
-            msg_len += 1
 
-        if full_msg[-6::] == "@BREAK":
-            print(f"Message received from server in {msg_len} packets.")
-            msg_len = 0  # Reset message length
-            print(full_msg[:-6])
-            full_msg = ''
-            msg = ''
 
 
 

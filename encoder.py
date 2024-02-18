@@ -1,24 +1,24 @@
 
-from music21 import *
+import music21 as m21
 
 
 def extract_notes_from_score(score):
     notes = []
     for element in score.flat.notes:
-        if isinstance(element, note.Note):
+        if isinstance(element, m21.note.Note):
             notes.append(element)
-        elif isinstance(element, chord.Chord):
+        elif isinstance(element, m21.chord.Chord):
             notes.extend(element.notes)
     return notes
 
 
 def find_max_overlapping_notes(file_path):
     max_overlapping_notes = 0
-    score = converter.parse(file_path)
+    score = m21.converter.parse(file_path)
 
     chordified_song = score.chordify()
 
-    for forced_chord in chordified_song.recurse().getElementsByClass(chord.Chord):
+    for forced_chord in chordified_song.recurse().getElementsByClass(m21.chord.Chord):
         chord_length = len(forced_chord.notes)
 
         if chord_length > max_overlapping_notes:
@@ -28,18 +28,25 @@ def find_max_overlapping_notes(file_path):
 
 
 def separate_song_overlappings(file_path):
-    pass
+    notes = []
+    score = m21.converter.parse(file_path)
+    notes = extract_notes_from_score(score)
 
+    max_overlap = find_max_overlapping_notes(file_path)
+    note_sets = [[]]*max_overlap
+    print(note_sets)
+    for i, note in enumerate(notes):
+        note_sets[i % max_overlap].append(note)
 
-
+    for note_set in note_sets:
+        s = m21.stream.Stream()
+        for note in note_set:
+            s.append(note)
 
 
 
 # Example usage
 file_path = 'Sample Songs/tester2.mid'
-find_max_overlapping_notes(file_path)
-# separate_song_overlappings(file_path)
-
-# check_note_overlap(notes)
+separate_song_overlappings(file_path)
 
 
