@@ -17,7 +17,7 @@ The composer can receive a MIDI file, check the number of clients required for a
 All of my efforts after this point were solely dedicated to getting a noise to play from a computer, which was oddly difficult
 
 ### Adapting the plan
-As it turns out, many computers nowadays don't have buzzers integrated into their motherboards. I'm not too sure when the collective descision was made to stop our computers from beeping, but it resulted in a rather devastating 'oh shit.' when I realised the _none_ of the computers 
+As it turns out, many computers nowadays don't have buzzers integrated into their motherboards. I'm not too sure when the collective descision was made to stop our computers from beeping, but it resulted in a rather devastating 'oh dear.' when I realised the _none_ of the computers 
 I had access to during the hackathon, (Desktop or Laptop) had a buzzer.
 
 I resorted to generating buzzing noises through the clients' speakers instead, sacrificing one of the project's main attractions.
